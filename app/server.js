@@ -1,24 +1,29 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const connectDB = require('./config/database');
-const typeDefs = [require('./graphql/schemas/panelSchema'), require('./graphql/schemas/taskSchema')];
-const resolvers = [require('./graphql/resolvers/panelResolver'), require('./graphql/resolvers/taskResolver')];
-const config = require('./config/config');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { mergeTypeDefs } = require('@graphql-tools/merge');
 
-const app = express();
+// Importa los esquemas
+const rootSchema = require('./graphql/schemas/rootSchema');
+const panelSchema = require('./graphql/schemas/panelSchema');
+const taskSchema = require('./graphql/schemas/taskSchema');
 
-// Conectar a la base de datos
-connectDB();
+// Une todos los esquemas en un solo esquema de GraphQL
+const typeDefs = mergeTypeDefs([rootSchema, panelSchema, taskSchema]);
+const schema = makeExecutableSchema({ typeDefs });
 
-// Inicializar Apollo Server
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-});
+async function startServer() {
+    const server = new ApolloServer({ schema });
+    await server.start(); // Asegúrate de que el servidor Apollo esté iniciado antes de aplicar el middleware
 
-server.applyMiddleware({ app });
+    const app = express();
+    server.applyMiddleware({ app });
 
-// Iniciar el servidor
-app.listen(config.PORT, () => {
-    console.log(`Server is running on http://localhost:${config.PORT}${server.graphqlPath}`);
+    app.listen({ port: 4000 }, () =>
+        console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+    );
+}
+
+startServer().catch(error => {
+    console.error("Error starting the server:", error);
 });
