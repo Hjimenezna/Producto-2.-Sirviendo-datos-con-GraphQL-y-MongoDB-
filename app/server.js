@@ -1,29 +1,40 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { mergeTypeDefs } = require('@graphql-tools/merge');
 
-// Importa los esquemas
+const config = require('./config/config'); // Asegúrate de importar tu archivo de configuración
 const rootSchema = require('./graphql/schemas/rootSchema');
 const panelSchema = require('./graphql/schemas/panelSchema');
 const taskSchema = require('./graphql/schemas/taskSchema');
+const resolvers = require('./graphql/resolvers');
 
 // Une todos los esquemas en un solo esquema de GraphQL
 const typeDefs = mergeTypeDefs([rootSchema, panelSchema, taskSchema]);
-const schema = makeExecutableSchema({ typeDefs });
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 async function startServer() {
-    const server = new ApolloServer({ schema });
-    await server.start(); // Asegúrate de que el servidor Apollo esté iniciado antes de aplicar el middleware
+    try {
+        // Conecta a MongoDB
+        await mongoose.connect(config.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Conectado a MongoDB');
 
-    const app = express();
-    server.applyMiddleware({ app });
+        const server = new ApolloServer({ schema });
+        await server.start();
 
-    app.listen({ port: 4000 }, () =>
-        console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-    );
+        const app = express();
+        server.applyMiddleware({ app });
+
+        app.listen({ port: config.PORT }, () =>
+            console.log(`🚀 Server ready at http://localhost:${config.PORT}${server.graphqlPath}`)
+        );
+    } catch (error) {
+        console.error("Error starting the server:", error);
+    }
 }
 
-startServer().catch(error => {
-    console.error("Error starting the server:", error);
-});
+startServer();

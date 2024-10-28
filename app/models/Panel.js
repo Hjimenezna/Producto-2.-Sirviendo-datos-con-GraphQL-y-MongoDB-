@@ -9,6 +9,10 @@ const panelSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    tasks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task'
+    }],
     createdAt: {
         type: Date,
         default: Date.now
@@ -16,12 +20,7 @@ const panelSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    },
-    tasks: [{ 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Task' 
-    }]
+    }
 });
 
-// Exporta el modelo directamente
 module.exports = mongoose.model('Panel', panelSchema);
