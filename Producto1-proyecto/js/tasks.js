@@ -92,6 +92,9 @@ async function displayTasks() {
     const porHacerCol = document.getElementById('porHacer');
     const enProcesoCol = document.getElementById('enProceso');
     const finalizadoCol = document.getElementById('finalizado');
+    
+    // Obtener el panelId del campo oculto o del contexto actual
+    const currentPanelId = document.getElementById('panelId').value;
 
     // Limpiar las columnas
     porHacerCol.innerHTML = '';
@@ -99,31 +102,37 @@ async function displayTasks() {
     finalizadoCol.innerHTML = '';
 
     tasks.forEach(task => {
-        const taskCard = document.createElement('div');
-        taskCard.classList.add('card', 'mb-3', 'draggable');
-        taskCard.setAttribute('id', task.id);
-        taskCard.setAttribute('draggable', 'true');
-        taskCard.ondragstart = drag;
+        if (task.panelId === currentPanelId) { // Filtrar solo por el panelId correspondiente
+            const taskCard = document.createElement('div');
+            taskCard.classList.add('card', 'mb-3', 'draggable');
+            taskCard.setAttribute('id', task.id);
+            taskCard.setAttribute('draggable', 'true');
+            taskCard.ondragstart = drag;
 
-        taskCard.innerHTML = `
-            <div class="card-body">
-                <h5 class="card-title">${task.title}</h5>
-                <p class="card-text">${task.description}</p>
-                <p class="card-text"><strong>Completado:</strong> ${task.completed ? 'Sí' : 'No'}</p>
-                <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
-                <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
-            </div>
-        `;
+            taskCard.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">${task.title}</h5>
+                    <p class="card-text">${task.description}</p>
+                    <p class="card-text"><strong>Completado:</strong> ${task.completed ? 'Sí' : 'No'}</p>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
+                    <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
+                </div>
+            `;
 
-        if (task.panelId === "613b6c867ff9e3a1d0801234") {
-            porHacerCol.appendChild(taskCard);
-        } else if (task.completed === true) {
-            finalizadoCol.appendChild(taskCard);
-        } else {
-            enProcesoCol.appendChild(taskCard);
+            if (task.completed) {
+                finalizadoCol.appendChild(taskCard);
+            } else {
+                porHacerCol.appendChild(taskCard);
+            }
         }
     });
 }
+
+// Inicializar el tablero con tareas
+document.addEventListener('DOMContentLoaded', () => {
+    displayTasks(); // Mostrar tareas solo para el panel actual
+});
+
 // Manejo de arrastrar y soltar (drag and drop)
 function allowDrop(ev) {
     ev.preventDefault();
@@ -191,6 +200,50 @@ function openEditModal(task) {
 }
 
 
+// Función para mostrar tareas en las columnas
+async function displayTasks() {
+    const tasks = await fetchTasks(); // Recupera las tareas
+    const porHacerCol = document.getElementById('porHacer');
+    const enProcesoCol = document.getElementById('enProceso');
+    const finalizadoCol = document.getElementById('finalizado');
+
+    // Obtener el panelId del campo oculto o del contexto actual
+    const currentPanelId = document.getElementById('panelId').value;
+
+    // Limpiar las columnas
+    porHacerCol.innerHTML = '';
+    enProcesoCol.innerHTML = '';
+    finalizadoCol.innerHTML = '';
+
+    // Filtrar y mostrar tareas en las columnas correspondientes
+    tasks.forEach(task => {
+        if (task.panelId === currentPanelId) { // Filtrar solo por el panelId correspondiente
+            const taskCard = document.createElement('div');
+            taskCard.classList.add('card', 'mb-3', 'draggable');
+            taskCard.setAttribute('id', task.id);
+            taskCard.setAttribute('draggable', 'true');
+            taskCard.ondragstart = drag;
+
+            taskCard.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">${task.title}</h5>
+                    <p class="card-text">${task.description}</p>
+                    <p class="card-text"><strong>Completado:</strong> ${task.completed ? 'Sí' : 'No'}</p>
+                    <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
+                    <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
+                </div>
+            `;
+
+            // Añadir la tarea a la columna correspondiente
+            if (task.completed) {
+                finalizadoCol.appendChild(taskCard);
+            } else {
+                porHacerCol.appendChild(taskCard);
+            }
+        }
+    });
+}
+
 // Guardar tarea o actualizar según el estado del botón
 document.getElementById('saveTaskButton').addEventListener('click', async function () {
     const taskId = this.dataset.taskId;
@@ -198,28 +251,36 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
     const description = document.getElementById('newTaskDescription').value;
     const panelId = document.getElementById('panelId').value;
 
-    if (taskId) {
-        // Actualizar la tarea
-        await updateTask(taskId, title, description, false); // Cambia el estado según tus necesidades
-        delete this.dataset.taskId;
-        this.textContent = "Guardar";
-    } else {
-        // Crear una nueva tarea
-        await createTask(title, description, panelId);
+    try {
+        if (taskId) {
+            // Actualizar la tarea existente
+            await updateTask(taskId, title, description, false); // Cambia el estado según tus necesidades
+            delete this.dataset.taskId; // Limpia el dataset para evitar confusiones
+            this.textContent = "Guardar"; // Cambia el texto del botón de guardar
+        } else {
+            // Crear una nueva tarea
+            await createTask(title, description, panelId);
+        }
+
+        resetForm(); // Resetea el formulario
+
+        // Llama a displayTasks para mostrar las tareas actualizadas inmediatamente
+        await displayTasks(); // Asegúrate de que la función sea asíncrona
+
+        // Cierra el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
+        modal.hide();
+    } catch (error) {
+        console.error('Error al guardar la tarea:', error);
     }
-
-    resetForm();
-    displayTasks();
-
-    const modal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
-    modal.hide();
 });
 
 // Resetear formulario del modal
 function resetForm() {
     document.getElementById('newTaskTitle').value = '';
     document.getElementById('newTaskDescription').value = '';
-    document.getElementById('panelId').value = '613b6c867ff9e3a1d0801234';
+    document.getElementById('panelId').value = '613b6c867ff9e3a1d0801234'; // Ajusta según el panel deseado
 }
-// Inicializar el tablero con tareas
-displayTasks();
+
+// Inicializar el tablero con tareas al cargar la página
+document.addEventListener('DOMContentLoaded', displayTasks);

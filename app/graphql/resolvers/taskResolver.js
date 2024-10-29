@@ -1,5 +1,6 @@
 const path = require('path');
-const Task = require(path.resolve(__dirname, '../../models/Task.js')); // Corregido a Task
+const Task = require(path.resolve(__dirname, '../../models/Task.js')); // Importa el modelo Task
+const Panel = require(path.resolve(__dirname, '../../models/Panel.js')); // Importa el modelo Panel
 
 const taskResolver = {
     Query: {
@@ -29,7 +30,7 @@ const taskResolver = {
                 const newTask = new Task({ title, description, panelId });
                 await newTask.save();
 
-                // Agrega el ID de la nueva tarea al panel correspondiente
+                // Asegúrate de que Panel se ha importado y está disponible
                 await Panel.findByIdAndUpdate(panelId, { $push: { tasks: newTask._id } });
 
                 return newTask;
@@ -43,7 +44,7 @@ const taskResolver = {
                 const updateData = {};
                 if (title) updateData.title = title;
                 if (description) updateData.description = description;
-                if (typeof completed !== 'undefined') updateData.completed = completed; // Verificar si se proporciona
+                if (typeof completed !== 'undefined') updateData.completed = completed;
 
                 const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
                 if (!updatedTask) throw new Error(`Task with ID ${id} not found`);
@@ -65,6 +66,5 @@ const taskResolver = {
         }
     }
 };
-
 
 module.exports = taskResolver;
