@@ -68,8 +68,8 @@
                 <!-- Encabezado de sección para los proyectos -->
                 <div class="d-flex justify-content-between align-items-center my-3">
                     <h2>Mis Proyectos</h2>
-                    <!-- Enlace para crear un nuevo proyecto -->
-                    <a href="nuevo-elemento.html" class="btn btn-primary">Nuevo proyecto</a>
+                    <!-- Botón para crear un nuevo proyecto -->
+                    <button class="btn btn-primary" id="nuevoProyectoBtn">Nuevo proyecto</button>
                 </div>
 
                 <!-- Contenedor para los proyectos -->
@@ -79,8 +79,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">Desarrollo full stack con JavaScript</h5>
-                                <p class="card-text">Este proyecto consiste en desarrollar una aplicación
-                                    colaborativa...</p>
+                                <p class="card-text">Este proyecto consiste en desarrollar una aplicación colaborativa...</p>
                                 <a href="tablero-fullstack.html" class="btn btn-primary">Ver Tareas</a>
                             </div>
                         </div>
@@ -95,7 +94,32 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal para crear un nuevo proyecto -->
+    <div class="modal fade" id="nuevoProyectoModal" tabindex="-1" aria-labelledby="nuevoProyectoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoProyectoModalLabel">Nuevo Proyecto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nuevoPanelNombre" class="form-label">Nombre del Proyecto</label>
+                        <input type="text" class="form-control" id="nuevoPanelNombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nuevoPanelDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="nuevoPanelDescripcion" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="crearPanelButton">Crear Proyecto</button>
+                </div>
             </div>
         </div>
     </div>
@@ -104,19 +128,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const proyectosContainer = document.getElementById('proyectosContainer');
-            // Obtener los proyectos guardados en localStorage o inicializar con un array vacío
             let proyectos = JSON.parse(localStorage.getItem('proyectos')) || [];
 
-            // Función para mostrar los proyectos adicionales que se añaden dinámicamente
             function mostrarProyectos() {
-                // Limpiar los proyectos dinámicos (manteniendo los estáticos)
                 const proyectosDinamicos = document.querySelectorAll('.proyecto-dinamico');
                 proyectosDinamicos.forEach(proyecto => proyecto.remove());
 
-                // Si hay proyectos guardados, se muestran
                 if (proyectos.length > 0) {
                     proyectos.forEach((proyecto, index) => {
-                        // Crear el HTML para cada proyecto dinámico
                         const proyectoHTML = `
                             <div class="col-lg-6 proyecto-dinamico">
                                 <div class="card mb-4">
@@ -131,30 +150,28 @@
                         proyectosContainer.innerHTML += proyectoHTML;
                     });
 
-                    // Añadir event listener a los botones de eliminar para cada proyecto
                     document.querySelectorAll('.eliminar-proyecto').forEach(button => {
                         button.addEventListener('click', function () {
                             const index = this.getAttribute('data-index');
-                            eliminarProyecto(index); // Llamar a la función para eliminar el proyecto
+                            eliminarProyecto(index);
                         });
                     });
                 }
             }
 
-            // Función para eliminar un proyecto del array y actualizar localStorage
             function eliminarProyecto(index) {
-                proyectos.splice(index, 1); // Eliminar el proyecto del array
-                localStorage.setItem('proyectos', JSON.stringify(proyectos)); // Guardar los cambios en localStorage
-                mostrarProyectos(); // Actualizar la vista de los proyectos dinámicos
+                proyectos.splice(index, 1);
+                localStorage.setItem('proyectos', JSON.stringify(proyectos));
+                mostrarProyectos();
             }
 
-            // Mostrar los proyectos dinámicos cuando la página se carga
             mostrarProyectos();
         });
     </script>
 
     <!-- Cargar Bootstrap y el script personalizado al final para que carguen después del contenido -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/panel.js"></script>
     <script src="js/main.js"></script>
 </body>
 

@@ -3,26 +3,9 @@ const Task = require(path.resolve(__dirname, '../../models/Task.js')); // Correg
 
 const taskResolver = {
     Query: {
-        getTasks: async () => {
-            try {
-                return await Task.find();
-            } catch (error) {
-                console.error("Error fetching tasks:", error);
-                throw new Error("Error fetching tasks");
-            }
-        },
-        getTask: async (_, { id }) => {
-            try {
-                const task = await Task.findById(id);
-                if (!task) throw new Error(`Task with ID ${id} not found`);
-                return task;
-            } catch (error) {
-                console.error("Error fetching task:", error);
-                throw new Error("Error fetching task");
-            }
-        }
+        getTasks: async () => await Task.find(),
+        getTask: async (_, { id }) => await Task.findById(id)
     },
-
     Mutation: {
         createTask: async (_, { title, description, panelId }) => {
             try {
@@ -38,6 +21,7 @@ const taskResolver = {
                 throw new Error("Error creating task");
             }
         },
+
         updateTask: async (_, { id, title, description, completed }) => {
             try {
                 const updateData = {};
