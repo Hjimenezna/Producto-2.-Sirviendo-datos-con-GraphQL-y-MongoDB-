@@ -8,7 +8,7 @@ const config = require('./config/config'); // Asegúrate de importar tu archivo 
 const rootSchema = require('./graphql/schemas/rootSchema');
 const panelSchema = require('./graphql/schemas/panelSchema');
 const taskSchema = require('./graphql/schemas/taskSchema');
-const resolvers = require('./graphql/resolvers');
+const resolvers = require('./graphql/resolvers/resolvers');
 
 // Une todos los esquemas en un solo esquema de GraphQL
 const typeDefs = mergeTypeDefs([rootSchema, panelSchema, taskSchema]);

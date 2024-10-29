@@ -1,3 +1,4 @@
+// models/Panel.js
 const mongoose = require('mongoose');
 
 const panelSchema = new mongoose.Schema({
@@ -12,15 +13,9 @@ const panelSchema = new mongoose.Schema({
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task'
-    }],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+    }]
+}, {
+    timestamps: true // Esto activa createdAt y updatedAt automáticamente
 });
 
 module.exports = mongoose.model('Panel', panelSchema);
