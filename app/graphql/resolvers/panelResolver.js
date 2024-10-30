@@ -13,21 +13,40 @@ const panelResolver = {
             return await newPanel.save();
         },
         updatePanel: async (_, { id, name, description }) => {
-            // Crea un objeto con los campos a actualizar
             const updateData = {};
             if (name) updateData.name = name;
             if (description) updateData.description = description;
 
-            // Actualiza el panel y devuelve el nuevo panel
             return await Panel.findByIdAndUpdate(id, updateData, { new: true });
         },
         deletePanel: async (_, { id }) => {
-            // Intenta eliminar el panel y devolverlo
-            const deletedPanel = await Panel.findByIdAndDelete(id);
-            if (!deletedPanel) {
-                throw new Error(`Panel with ID ${id} not found`);
+            try {
+                console.log(`Intentando eliminar el panel con ID: ${id}`);
+                
+                // Primero, verificamos cuántas tareas hay antes de la eliminación
+                const tasksBeforeDeletion = await Task.find({ panelId: id });
+                console.log(`Tareas encontradas para el panel ${id} antes de la eliminación:`, tasksBeforeDeletion);
+        
+                // Eliminamos todas las tareas asociadas al panel
+                const deleteTasksResult = await Task.deleteMany({ panelId: id });
+                console.log(`Resultado de la eliminación de tareas para el panel ${id}:`, deleteTasksResult);
+                
+                if (deleteTasksResult.deletedCount === 0) {
+                    console.warn(`No se encontraron tareas asociadas al panel ${id}.`);
+                } else {
+                    console.log(`Se eliminaron ${deleteTasksResult.deletedCount} tareas asociadas al panel ${id}.`);
+                }
+        
+                // Luego, eliminamos el propio panel
+                const deletedPanel = await Panel.findByIdAndDelete(id);
+                if (!deletedPanel) throw new Error(`Panel con ID ${id} no encontrado`);
+                console.log(`Panel eliminado con éxito:`, deletedPanel);
+                
+                return deletedPanel;
+            } catch (error) {
+                console.error("Error eliminando el panel y sus tareas:", error);
+                throw new Error("Error eliminando el panel y sus tareas");
             }
-            return deletedPanel; // Retorna el panel eliminado
         }
     },
     Panel: {

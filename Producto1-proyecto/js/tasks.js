@@ -244,7 +244,7 @@ async function displayTasks() {
     });
 }
 
-// Guardar tarea o actualizar según el estado del botón
+
 document.getElementById('saveTaskButton').addEventListener('click', async function () {
     const taskId = this.dataset.taskId;
     const title = document.getElementById('newTaskTitle').value;
@@ -255,32 +255,22 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
         if (taskId) {
             // Actualizar la tarea existente
             await updateTask(taskId, title, description, false); // Cambia el estado según tus necesidades
-            delete this.dataset.taskId; // Limpia el dataset para evitar confusiones
-            this.textContent = "Guardar"; // Cambia el texto del botón de guardar
+            delete this.dataset.taskId;
+            this.textContent = "Guardar";
         } else {
             // Crear una nueva tarea
             await createTask(title, description, panelId);
         }
 
-        resetForm(); // Resetea el formulario
-
         // Llama a displayTasks para mostrar las tareas actualizadas inmediatamente
-        await displayTasks(); // Asegúrate de que la función sea asíncrona
+        await displayTasks();
 
-        // Cierra el modal
+        // Cierra el modal solo después de que displayTasks ha terminado
         const modal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
         modal.hide();
+
+
     } catch (error) {
         console.error('Error al guardar la tarea:', error);
     }
 });
-
-// Resetear formulario del modal
-function resetForm() {
-    document.getElementById('newTaskTitle').value = '';
-    document.getElementById('newTaskDescription').value = '';
-    document.getElementById('panelId').value = '613b6c867ff9e3a1d0801234'; // Ajusta según el panel deseado
-}
-
-// Inicializar el tablero con tareas al cargar la página
-document.addEventListener('DOMContentLoaded', displayTasks);

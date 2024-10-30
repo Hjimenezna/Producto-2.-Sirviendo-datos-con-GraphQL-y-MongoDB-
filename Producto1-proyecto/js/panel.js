@@ -1,4 +1,5 @@
 const apiUrl = 'http://localhost:4000/graphql'; // URL del servidor GraphQL
+let panelToDeleteId = null; // Variable para almacenar el ID del panel a eliminar
 
 // Obtener todos los paneles desde el backend
 async function fetchPanels() {
@@ -61,26 +62,45 @@ async function createPanel(name, description) {
     }
 }
 
-// Eliminar un panel
-async function deletePanel(id) {
+// Función para abrir el modal de confirmación y establecer el ID del panel a eliminar
+function confirmDeletePanel(id) {
+    panelToDeleteId = id; // Guardamos el ID del panel
+    const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    confirmDeleteModal.show(); // Mostramos el modal de confirmación
+}
+
+async function deletePanel() {
     const mutation = `
         mutation {
-            deletePanel(id: "${id}") {
+            deletePanel(id: "${panelToDeleteId}") {
                 id
             }
         }
     `;
     try {
-        await fetch(apiUrl, {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ query: mutation }),
         });
-        displayPanels(); // Actualizar visualización
+
+        const result = await response.json();
+        if (result.errors) {
+            console.error('Error deleting panel:', result.errors);
+            alert('Error al eliminar el panel.');
+            return;
+        }
+
+        displayPanels(); // Actualizamos la visualización de paneles
     } catch (error) {
         console.error('Error deleting panel:', error);
+        alert('Error al eliminar el panel.');
+    } finally {
+        panelToDeleteId = null; // Restablecer el ID del panel
+        const confirmDeleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+        confirmDeleteModal.hide(); // Ocultar el modal de confirmación
     }
 }
 
@@ -108,7 +128,7 @@ async function displayPanels() {
                     <h5 class="card-title">${panel.name}</h5>
                     <p class="card-text">${panel.description}</p>
                     <a href="tablero.html?panelId=${panel.id}" class="btn btn-primary">Ver Tareas</a>
-                    <button class="btn btn-danger btn-sm" onclick="deletePanel('${panel.id}')">Eliminar</button>
+                   <button class="btn btn-danger btn-sm" onclick="confirmDeletePanel('${panel.id}')">Eliminar</button>
                 </div>
             </div>
         `;
@@ -130,6 +150,10 @@ document.getElementById('savePanelButton').addEventListener('click', async () =>
     const modal = bootstrap.Modal.getInstance(document.getElementById('newPanelModal'));
     modal.hide();
 });
+
+// Asignar el evento al botón de confirmación de eliminación en el modal
+document.getElementById('confirmDeleteButton').addEventListener('click', deletePanel);
+
 
 // Inicializar vista de paneles
 displayPanels();
