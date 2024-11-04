@@ -20,6 +20,7 @@
             </div>
         </div>
 
+        <!-- Content -->
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
                 <div class="container-fluid">
@@ -31,8 +32,7 @@
             </nav>
 
             <div class="container-fluid">
-                <h1 class="mt-4">Tablero - Back-end con Java</h1>
-
+                <h1 class="mt-4" id="panelTitle">Tablero - Tareas</h1>
                 <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newTaskModal">Añadir Tarea</button>
 
                 <div class="row mt-4">
@@ -53,6 +53,7 @@
         </div>
     </div>
 
+    <!-- Modal para crear o editar tareas -->
     <div class="modal fade" id="newTaskModal" tabindex="-1" aria-labelledby="newTaskModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -61,7 +62,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="panelId" value="613b6c867ff9e3a1d0801234">
+                    <input type="hidden" id="panelId" value="">
                     <div class="mb-3">
                         <label for="newTaskTitle" class="form-label">Título del Elemento</label>
                         <input type="text" class="form-control" id="newTaskTitle" placeholder="Introduce el título" required>
@@ -70,6 +71,10 @@
                         <label for="newTaskDescription" class="form-label">Descripción</label>
                         <textarea class="form-control" id="newTaskDescription" rows="3" placeholder="Descripción" required></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label for="newTaskResponsible" class="form-label">Responsable</label>
+                        <input type="text" class="form-control" id="newTaskResponsible" placeholder="Introduce el nombre del responsable" required>
+                    </div>                    
                     <div class="mb-3">
                         <label for="newTaskEstado" class="form-label">Estado</label>
                         <select class="form-control" id="newTaskEstado" required>

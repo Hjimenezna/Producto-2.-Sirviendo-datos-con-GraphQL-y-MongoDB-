@@ -71,6 +71,10 @@
                         <textarea class="form-control" id="newTaskDescription" rows="3" placeholder="Descripción" required></textarea>
                     </div>
                     <div class="mb-3">
+                        <label for="newTaskResponsible" class="form-label">Responsable</label>
+                        <input type="text" class="form-control" id="newTaskResponsible" placeholder="Introduce el nombre del responsable" required>
+                    </div>                    
+                    <div class="mb-3">
                         <label for="newTaskEstado" class="form-label">Estado</label>
                         <select class="form-control" id="newTaskEstado" required>
                             <option value="porHacer">Por Hacer</option>
@@ -99,5 +103,7 @@
             await displayTasks(); 
         };
     </script>
+
+<script src="js/main.js"></script>
 </body>
 </html>

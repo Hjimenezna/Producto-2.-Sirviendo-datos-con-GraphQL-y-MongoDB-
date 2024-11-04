@@ -14,6 +14,10 @@ const taskSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    responsible: {         // Nuevo campo de responsable
+        type: String,
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -28,5 +32,6 @@ const taskSchema = new mongoose.Schema({
         required: true
     }
 });
+
 
 module.exports = mongoose.model('Task', taskSchema);

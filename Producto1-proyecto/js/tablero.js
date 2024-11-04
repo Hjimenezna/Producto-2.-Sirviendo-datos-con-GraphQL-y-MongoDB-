@@ -54,15 +54,15 @@ async function displayTasks() {
             taskCard.ondragstart = drag;
 
             taskCard.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${task.title}</h5>
-                    <p class="card-text">${task.description}</p>
-                    <p class="card-text"><strong>Completado:</strong> ${task.completed ? 'Sí' : 'No'}</p>
-                    <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
-                    <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
-                </div>
-            `;
-
+    <div class="card-body">
+        <h5 class="card-title">${task.title}</h5>
+        <p class="card-text">${task.description}</p>
+        <p class="card-text"><strong>Responsable:</strong> ${task.responsible}</p>   <!-- Mostrar responsable -->
+        <p class="card-text"><strong>Creado el:</strong> ${new Date(task.createdAt).toLocaleDateString()}</p> <!-- Mostrar fecha de creación -->
+        <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
+        <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
+    </div>
+`;
             // Añadir a la columna correspondiente
             if (task.completed) {
                 finalizadoCol.appendChild(taskCard);
@@ -76,21 +76,29 @@ async function displayTasks() {
 }
 
 // Almacenando la tarea al hacer clic en guardar
-document.getElementById('saveTaskButton').onclick = async function() {
+document.getElementById('saveTaskButton').addEventListener('click', async function () {
+    const taskId = this.dataset.taskId;
+    const title = document.getElementById('newTaskTitle').value;
+    const description = document.getElementById('newTaskDescription').value;
+    const responsible = document.getElementById('newTaskResponsible').value; // Nuevo campo
     const panelId = document.getElementById('panelId').value;
-    const newTaskTitle = document.getElementById('newTaskTitle').value;
-    const newTaskDescription = document.getElementById('newTaskDescription').value;
-    const newTaskEstado = document.getElementById('newTaskEstado').value;
 
-    // Crear la nueva tarea en el servidor
-    const newTask = await createTask(newTaskTitle, newTaskDescription, panelId);
+    try {
+        if (taskId) {
+            // Actualizar tarea existente
+            await updateTask(taskId, title, description, false);
+            delete this.dataset.taskId;
+            this.textContent = "Guardar";
+        } else {
+            // Crear tarea nueva con responsible
+            await createTask(title, description, panelId, responsible);
+        }
 
-    // Limpiar el modal y cerrar
-    document.getElementById('newTaskTitle').value = '';
-    document.getElementById('newTaskDescription').value = '';
-    document.getElementById('newTaskEstado').value = 'porHacer';
-    $('#newTaskModal').modal('hide');
+        await displayTasks();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
+        modal.hide();
 
-    // Recargar tareas para el panel
-    displayTasks();
-};
+    } catch (error) {
+        console.error('Error al guardar la tarea:', error);
+    }
+});
