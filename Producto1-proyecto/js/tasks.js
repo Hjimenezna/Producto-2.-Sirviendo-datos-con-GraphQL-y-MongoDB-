@@ -67,28 +67,55 @@ async function createTask(title, description, panelId, responsible) {  // Añadi
     }
 }
 
-// Eliminar una tarea
+// Función para eliminar una tarea con SweetAlert2
 async function deleteTask(id) {
-    const mutation = `
-        mutation {
-            deleteTask(id: "${id}") {
-                id
+    // Mostrar alerta de confirmación
+    Swal.fire({
+        title: '¿Eliminar esta tarea?',
+        text: "Esta acción no puede deshacerse.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff', // Color del botón de confirmación (azul)
+        cancelButtonColor: '#d33',     // Color del botón de cancelación (rojo)
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // Mutación para eliminar la tarea si el usuario confirma
+            const mutation = `
+                mutation {
+                    deleteTask(id: "${id}") {
+                        id
+                    }
+                }
+            `;
+            try {
+                await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: mutation }),
+                });
+
+                // Actualizar la visualización de las tareas
+                displayTasks();
+
+                // Alerta de éxito después de la eliminación
+                Swal.fire({
+                    title: 'Eliminada!',
+                    text: 'La tarea ha sido eliminada.',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#28a745' // Color del botón "OK" en el popup de éxito (verde)
+                });
+            } catch (error) {
+                console.error('Error deleting task:', error);
             }
         }
-    `;
-    try {
-        await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ query: mutation }),
-        });
-        displayTasks(); // Actualizar la visualización
-    } catch (error) {
-        console.error('Error deleting task:', error);
-    }
+    });
 }
+
 // Manejo de arrastrar y soltar (drag and drop)
 function allowDrop(ev) {
     ev.preventDefault();
@@ -233,3 +260,5 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
         console.error('Error al guardar la tarea:', error);
     }
 });
+
+
