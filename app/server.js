@@ -14,6 +14,22 @@ const resolvers = require('./graphql/resolvers/resolvers');
 const typeDefs = mergeTypeDefs([rootSchema, panelSchema, taskSchema]);
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
+const express = require('express');
+const path = require('path');
+
+const app = express();
+
+// Define el puerto, usando el proporcionado por CodeSandbox o un puerto local (como 3000)
+const port = process.env.PORT || 3000;
+
+// Configura Express para servir archivos estáticos desde la carpeta raíz o "Producto1-proyecto"
+app.use(express.static(path.join(__dirname, 'Producto1-proyecto')));
+
+// Ruta para servir el archivo "index.html" en la raíz "/"
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Producto1-proyecto', 'index.html'));
+});
+
 async function startServer() {
     try {
         // Conecta a MongoDB
