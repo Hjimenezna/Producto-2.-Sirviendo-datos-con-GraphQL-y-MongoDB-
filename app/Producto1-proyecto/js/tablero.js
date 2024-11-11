@@ -1,5 +1,5 @@
 // tablero.js
-const apiUrl = "http://localhost:4000/graphql"; // Cambia esto a la URL de tu servidor GraphQL
+const apiUrl = "https://xhgyxk-4000.csb.app/graphql"; // Cambia esto a la URL de tu servidor GraphQL
 
 // Obtener el ID del panel desde la URL
 const urlParams = new URLSearchParams(window.location.search);
