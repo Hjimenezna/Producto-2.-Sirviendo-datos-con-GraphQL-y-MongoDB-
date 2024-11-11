@@ -1,6 +1,6 @@
 // Archivo: js/tasks.js
 
-const apiUrl = "https://xhgyxk-4000.csb.app/graphql"; // Cambia esto a la URL de tu servidor GraphQL
+const apiUrl = "https://66nm92-4000.csb.app/graphql"; // Cambia esto a la URL de tu servidor GraphQL
 
 // Obtener todas las tareas desde el backend
 async function fetchTasks() {

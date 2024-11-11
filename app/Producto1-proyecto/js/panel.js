@@ -1,4 +1,4 @@
-const apiUrl = "https://xhgyxk-4000.csb.app/graphql"; // URL del servidor GraphQL
+const apiUrl = "https://66nm92-4000.csb.app/graphql"; // URL del servidor GraphQL
 let panelToDeleteId = null; // Variable para almacenar el ID del panel a eliminar
 
 // Obtener todos los paneles desde el backend
