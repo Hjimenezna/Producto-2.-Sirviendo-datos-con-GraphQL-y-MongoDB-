@@ -62,15 +62,33 @@ async function createPanel(name, description) {
   }
 }
 
-// Función para abrir el modal de confirmación y establecer el ID del panel a eliminar
-function confirmDeletePanel(id) {
-  panelToDeleteId = id; // Guardamos el ID del panel
-  const confirmDeleteModal = new bootstrap.Modal(
-    document.getElementById("confirmDeleteModal")
-  );
-  confirmDeleteModal.show(); // Mostramos el modal de confirmación
-}
+// Archivo: js/panel.js
 
+// Función para abrir la alerta de confirmación y establecer el ID del panel a eliminar
+function confirmDeletePanel(id) {
+  // Guardamos el ID del panel en una variable global
+  panelToDeleteId = id;
+
+  // Mostrar la alerta de confirmación usando SweetAlert
+  Swal.fire({
+    title: "¿Eliminar este panel?",
+    text: "Esta acción no se puede deshacer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#007bff", // Color del botón de confirmación
+    cancelButtonColor: "#d33", // Color del botón de cancelación
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Llama a la función para eliminar el panel si el usuario confirma
+      deletePanel();
+    } else {
+      // Restablecer panelToDeleteId si el usuario cancela
+      panelToDeleteId = null;
+    }
+  });
+}
 async function deletePanel() {
   const mutation = `
         mutation {
@@ -91,20 +109,37 @@ async function deletePanel() {
     const result = await response.json();
     if (result.errors) {
       console.error("Error deleting panel:", result.errors);
-      alert("Error al eliminar el panel.");
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo eliminar el panel.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
-    displayPanels(); // Actualizamos la visualización de paneles
+    // Alerta de éxito después de eliminar el panel
+    Swal.fire({
+      title: "Eliminado",
+      text: "El panel ha sido eliminado correctamente.",
+      icon: "success",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#28a745", // Color del botón de confirmación (verde)
+    });
+
+    // Actualizamos la visualización de paneles
+    displayPanels();
   } catch (error) {
     console.error("Error deleting panel:", error);
-    alert("Error al eliminar el panel.");
+    Swal.fire({
+      title: "Error",
+      text: "No se pudo eliminar el panel.",
+      icon: "error",
+      confirmButtonText: "OK",
+    });
   } finally {
-    panelToDeleteId = null; // Restablecer el ID del panel
-    const confirmDeleteModal = bootstrap.Modal.getInstance(
-      document.getElementById("confirmDeleteModal")
-    );
-    confirmDeleteModal.hide(); // Ocultar el modal de confirmación
+    // Restablecer el ID del panel a eliminar
+    panelToDeleteId = null;
   }
 }
 
