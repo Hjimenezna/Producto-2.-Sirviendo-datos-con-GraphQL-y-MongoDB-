@@ -1,21 +1,21 @@
 // models/Panel.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); // Importa mongoose para definir el esquema de datos
 
 const panelSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true         // Nombre del panel, campo obligatorio
     },
     description: {
         type: String,
-        default: ''
+        default: ''            // Descripción del panel, opcional con valor predeterminado vacío
     },
     tasks: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task'
+        ref: 'Task'            // Array de IDs de tareas asociadas al panel, referenciando el modelo Task
     }]
 }, {
-    timestamps: true // Esto activa createdAt y updatedAt automáticamente
+    timestamps: true            // Activa automáticamente createdAt y updatedAt en el esquema
 });
 
-module.exports = mongoose.model('Panel', panelSchema);
+module.exports = mongoose.model('Panel', panelSchema); // Exporta el modelo Panel para usarlo en la base de datos

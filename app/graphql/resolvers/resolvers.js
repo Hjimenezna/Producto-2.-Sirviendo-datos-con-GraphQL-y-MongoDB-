@@ -6,14 +6,14 @@ const panelResolver = require('./panelResolver');
 
 const resolvers = {
     Query: {
-        ...panelResolver.Query,
-        ...taskResolver.Query, // Asume que taskResolver tiene definidas sus queries
+        ...panelResolver.Query, // Importa todas las queries definidas en panelResolver
+        ...taskResolver.Query, // Importa todas las queries definidas en taskResolver
     },
     Mutation: {
-        ...panelResolver.Mutation,
-        ...taskResolver.Mutation, // Asume que taskResolver tiene definidas sus mutations
+        ...panelResolver.Mutation, // Importa todas las mutations definidas en panelResolver
+        ...taskResolver.Mutation, // Importa todas las mutations definidas en taskResolver
     },
-    Panel: panelResolver.Panel // Esto debería funcionar ahora
+    Panel: panelResolver.Panel // Define resolvers personalizados para el tipo Panel, como obtener tareas asociadas
 };
 
 module.exports = resolvers;

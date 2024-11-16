@@ -1,21 +1,19 @@
-const { gql } = require('apollo-server-express');
-const panelSchema = require('./panelSchema');
-const taskSchema = require('./taskSchema');
-
+const { gql } = require('apollo-server-express'); // Importa gql para definir el esquema GraphQL
+const panelSchema = require('./panelSchema'); // Importa el esquema del Panel
+const taskSchema = require('./taskSchema');   // Importa el esquema de Task
 
 const rootSchema = gql`
     type Query {
-        _empty: String
+        _empty: String         # Tipo Query inicial vacío para ser extendido
     }
 
     type Mutation {
-        _empty: String
+        _empty: String         # Tipo Mutation inicial vacío para ser extendido
     }
 
-        # Fusionamos los tipos de Panel y Task
+    # Fusiona los tipos de Panel y Task en el esquema raíz
     ${panelSchema}
     ${taskSchema}
-
 `;
 
-module.exports = rootSchema;
+module.exports = rootSchema; // Exporta el esquema raíz para integrarlo en el servidor Apollo
