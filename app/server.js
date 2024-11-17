@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { mergeTypeDefs } = require('@graphql-tools/merge');
